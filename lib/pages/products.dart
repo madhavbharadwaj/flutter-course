@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/products/products.dart';
 import 'package:scoped_model/scoped_model.dart';
-import '../scoped-models/main.dart';
 
+import '../widgets/products/products.dart';
+import '../scoped-models/main.dart';
+import '../widgets/ui_elements/logout_list.dart';
 class ProductsPage extends StatefulWidget {
   final MainModel model;
 
   ProductsPage(this.model);
+
   @override
   State<StatefulWidget> createState() {
     return _ProductsPageState();
@@ -27,34 +29,32 @@ class _ProductsPageState extends State<ProductsPage> {
         children: <Widget>[
           AppBar(
             automaticallyImplyLeading: false,
-            title: Text("Choose"),
+            title: Text('Choose'),
           ),
           ListTile(
             leading: Icon(Icons.edit),
-            title: Text("Manage Products"),
+            title: Text('Manage Products'),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/admin');
             },
-          )
+          ),
+          Divider(),
+          LogoutListTile(),
         ],
       ),
     );
   }
 
   Widget _buildProductsList() {
-    return ScopedModelDescendant<MainModel>(
+    return ScopedModelDescendant(
       builder: (BuildContext context, Widget child, MainModel model) {
-        Widget content = Center(child: Text("No Products Found"));
+        Widget content = Center(child: Text('No Products Found!'));
         if (model.displayedProducts.length > 0 && !model.isLoading) {
           content = Products();
         } else if (model.isLoading) {
           content = Center(child: CircularProgressIndicator());
         }
-
-        return RefreshIndicator(
-          onRefresh: model.fetchProducts,
-          child: content,
-        );
+        return RefreshIndicator(onRefresh: model.fetchProducts, child: content,) ;
       },
     );
   }
@@ -69,11 +69,9 @@ class _ProductsPageState extends State<ProductsPage> {
           ScopedModelDescendant<MainModel>(
             builder: (BuildContext context, Widget child, MainModel model) {
               return IconButton(
-                icon: Icon(
-                  model.displayFavoritesOnly
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                ),
+                icon: Icon(model.displayFavoritesOnly
+                    ? Icons.favorite
+                    : Icons.favorite_border),
                 onPressed: () {
                   model.toggleDisplayMode();
                 },

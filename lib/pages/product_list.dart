@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_course/pages/product_edit.dart';
 
 import 'package:scoped_model/scoped_model.dart';
+
+import './product_edit.dart';
 import '../scoped-models/main.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -10,14 +11,14 @@ class ProductListPage extends StatefulWidget {
   ProductListPage(this.model);
 
   @override
-  State<StatefulWidget> createState() {
-    return _ProductListPageState();
-  }
+    State<StatefulWidget> createState() {
+      return _ProductListPageState();
+    }
 }
 
-class _ProductListPageState extends State<ProductListPage>{
+class _ProductListPageState extends State<ProductListPage> {
   @override
-  void initState() {
+  initState() {
     widget.model.fetchProducts();
     super.initState();
   }
@@ -28,12 +29,12 @@ class _ProductListPageState extends State<ProductListPage>{
       onPressed: () {
         model.selectProduct(model.allProducts[index].id);
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (BuildContext context) {
-            return ProductEditPage();
-          }),
-        ).then((_) {
-          model.selectProduct(null);
-        });
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return ProductEditPage();
+            },
+          ),
+        );
       },
     );
   }
@@ -43,60 +44,40 @@ class _ProductListPageState extends State<ProductListPage>{
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         return ListView.builder(
-          itemBuilder: (BuildContext context, int index) => Dismissible(
-                background: Container(color: Colors.red),
-                key: Key(model.allProducts[index].title),
-                onDismissed: (DismissDirection direction) {
-                  if (direction == DismissDirection.endToStart) {
-                    model.selectProduct(model.allProducts[index].id);
-                    model.deleteProduct();
-                  } else if (direction == DismissDirection.startToEnd) {
-                    print("Swiped Start to end");
-                  } else {
-                    print("Other swiping");
-                  }
-                },
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(model.allProducts[index].image),
-                      ),
-                      title: Text(model.allProducts[index].title),
-                      subtitle: Text(
-                          '\$${model.allProducts[index].price.toString()}'),
-                      trailing: _buildEditButton(context, index, model),
+          itemBuilder: (BuildContext context, int index) {
+            return Dismissible(
+              key: Key(model.allProducts[index].title),
+              onDismissed: (DismissDirection direction) {
+                if (direction == DismissDirection.endToStart) {
+                  model.selectProduct(model.allProducts[index].id);
+                  model.deleteProduct();
+                } else if (direction == DismissDirection.startToEnd) {
+                  print('Swiped start to end');
+                } else {
+                  print('Other swiping');
+                }
+              },
+              background: Container(color: Colors.red),
+              child: Column(
+                children: <Widget>[
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage:
+                          NetworkImage(model.allProducts[index].image),
                     ),
-                    Divider()
-                  ],
-                ),
+                    title: Text(model.allProducts[index].title),
+                    subtitle:
+                        Text('\$${model.allProducts[index].price.toString()}'),
+                    trailing: _buildEditButton(context, index, model),
+                  ),
+                  Divider()
+                ],
               ),
+            );
+          },
           itemCount: model.allProducts.length,
         );
       },
     );
-
-    // return ListView.builder(
-
-    //   itemBuilder: (BuildContext context, int index) {
-    //     ListTile(
-
-    //       leading: Image.asset(products[index]['image']),
-    //       title: Text(products[index]['title']),
-    //       trailing: IconButton(
-    //         icon: Icon(Icons.edit),
-    //         onPressed: () {
-    //           Navigator.of(context).push(
-    //             MaterialPageRoute(builder: (BuildContext context) {
-    //               ProductEditPage(product: products[index]);
-    //             }),
-    //           );
-    //         },
-    //       ),
-    //     );
-    //   },
-    //   itemCount: products.length,
-    // );
   }
 }
